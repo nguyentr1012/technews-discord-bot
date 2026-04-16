@@ -1,6 +1,6 @@
 import httpx
 import feedparser
-import loguru
+from loguru import logger
 from src.config import RSS_SOURCES, AI_RELEASE_SOURCES, AI_RELEASE_KEYWORDS, PRIORITY_KEYWORDS
 
 
@@ -14,18 +14,18 @@ def fetch_rss(url:str, name:str) -> list[dict]:
         feed = feedparser.parse(resp.text)
         articles =[]
         for entry in feed.entries[:15]:
-            artticles.append({
+            articles.append({
                 "source_name": name,
                 "source_type": 'article',
-                "source_url": entry.get('link'),
-                "title"; entry.get('title'),
-                "content_raw": entry.get('summary')[:2000],
+                "source_url": entry.get('link', ''),
+                "title": entry.get('title', ''),
+                "content_raw": entry.get('summary', '')[:2000],
             })
-            logger.info(f"Found {len(articles)} articles from {name}")
+        logger.info(f"Found {len(articles)} articles from {name}")
         return articles
-        except Exception as e:
-            logger.error(f"Error fetching RSS feed from {name}: {e}")
-            return []
+    except Exception as ex:
+        logger.error(f"Error fetching RSS feed from {name}: {ex}")
+        return []
 
 
 def fetch_hackernews() -> list[dict]:
@@ -40,9 +40,9 @@ def fetch_hackernews() -> list[dict]:
             articles.append({
                 "source_name": "hackernews",
                 "source_type": 'article',
-                "source_url":h.get("url") or f"https://news.ycombinator.com/item?id={h['objectID']}",
-                "title": h['title'],
-                "content_raw": h['story_text'] or "",
+                "source_url": h.get("url") or f"https://news.ycombinator.com/item?id={h['objectID']}",
+                "title": h.get('title', ''),
+                "content_raw": h.get('story_text', '') or "",
                 "hn_points": h.get('points', 0),
             })
         logger.info(f"Found {len(articles)} articles from hackernews")
@@ -51,11 +51,11 @@ def fetch_hackernews() -> list[dict]:
         logger.error(f"Error fetching HackerNews: {e}")
         return []
 
-        def is_ai_release(title:str, content: str = "") -> bool:
+def is_ai_release(title:str, content: str = "") -> bool:
             text =(title + "" + content[:300]).lower()
             return any(keyword.lower() in text for keyword in AI_RELEASE_KEYWORDS)
 
-      def score_article(a: dict) -> float:
+def score_article(a: dict) -> float:
     score = {"techcrunch": 1.2, "arstechnica": 1.3, "hackernews": 1.5}.get(a.get("source_name", ""), 1.0)
     score += min(a.get("hn_points", 0) / 100, 2.0)
     tl = a.get("title", "").lower()

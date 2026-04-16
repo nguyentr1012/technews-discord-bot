@@ -1,6 +1,7 @@
 import httpx
-import selectolax.parser import HTMLParser
+from selectolax.parser import HTMLParser
 from loguru import logger
+
 
 def scrape_github_trending(limit:int=3) -> list[dict]:
     try:
@@ -19,7 +20,7 @@ def scrape_github_trending(limit:int=3) -> list[dict]:
                 continue
             href = name_el.attributes.get("href","")
             repos.append({
-                "name": href.strip("/").replace(" ", "")
+                "name": href.strip("/").replace(" ", ""),
                 "url": f"https://github.com{href}",
                 "description": description_el.text() if description_el else "",
                 "language": language_el.text() if language_el else "",
