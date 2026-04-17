@@ -35,4 +35,4 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           RUN_ONCE: "true"
-        run: uv run python run_once.py
+        run: uv run python src/run_once.py
