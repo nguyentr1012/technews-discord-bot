@@ -22,9 +22,9 @@ def scrape_github_trending(limit:int=3) -> list[dict]:
             repos.append({
                 "name": href.strip("/").replace(" ", ""),
                 "url": f"https://github.com{href}",
-                "description": description_el.text() if description_el else "",
-                "language": language_el.text() if language_el else "",
-                "today": today_el.text() if today_el else "",
+                "description": description_el.text().strip() if description_el else "",
+                "language": language_el.text().strip() if language_el else "",
+                "stars_today": today_el.text().strip() if today_el else "",
             })
         logger.info(f"Found {len(repos)} repositories from GitHub trending")
         return repos

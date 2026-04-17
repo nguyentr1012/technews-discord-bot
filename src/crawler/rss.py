@@ -51,9 +51,9 @@ def fetch_hackernews() -> list[dict]:
         logger.error(f"Error fetching HackerNews: {e}")
         return []
 
-def is_ai_release(title:str, content: str = "") -> bool:
-            text =(title + "" + content[:300]).lower()
-            return any(keyword.lower() in text for keyword in AI_RELEASE_KEYWORDS)
+def is_ai_release(title: str, content: str = "") -> bool:
+    text = (title + " " + content[:300]).lower()
+    return any(keyword.lower() in text for keyword in AI_RELEASE_KEYWORDS)
 
 def score_article(a: dict) -> float:
     score = {"techcrunch": 1.2, "arstechnica": 1.3, "hackernews": 1.5}.get(a.get("source_name", ""), 1.0)
