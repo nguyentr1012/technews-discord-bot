@@ -5,6 +5,11 @@ Crawl + AI + post Discord rồi thoát, không loop.
 
 import asyncio
 import sys
+import os
+
+# Thêm thư mục gốc vào sys.path để tránh lỗi ModuleNotFoundError
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from loguru import logger
 
 logger.remove()
