@@ -3,14 +3,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID")
-DISCORD_CHANNEL_ID = int(os.getenv("DISCORD_CHANNEL_ID", "0"))
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-DIGEST_HOUR = int(os.getenv("DIGEST_HOUR", "8"))
-DIGEST_MINUTE = int(os.getenv("DIGEST_MINUTE", "0"))
+GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
+DISCORD_TOKEN = (os.getenv("DISCORD_TOKEN") or os.getenv("DISCORD_BOT_TOKEN") or "").strip()
+DISCORD_GUILD_ID = (os.getenv("DISCORD_GUILD_ID") or "").strip()
+
+raw_channel_id = (os.getenv("DISCORD_CHANNEL_ID") or "").strip()
+DISCORD_CHANNEL_ID = int(raw_channel_id) if raw_channel_id.isdigit() else 0
+
+SUPABASE_URL = (os.getenv("SUPABASE_URL") or "").strip()
+SUPABASE_KEY = (os.getenv("SUPABASE_KEY") or "").strip()
+
+raw_digest_hour = (os.getenv("DIGEST_HOUR") or "").strip()
+DIGEST_HOUR = int(raw_digest_hour) if raw_digest_hour.isdigit() else 8
+
+raw_digest_min = (os.getenv("DIGEST_MINUTE") or "").strip()
+DIGEST_MINUTE = int(raw_digest_min) if raw_digest_min.isdigit() else 0
 
 RSS_SOURCES = [
     {"name": "techcrunch",  "url": "https://techcrunch.com/feed/",                         "is_api": False},

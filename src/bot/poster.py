@@ -14,14 +14,28 @@ CATEGORY_COLORS = {
 
 
 def build_embed(article: dict, summary: dict) -> discord.Embed:
+    if not isinstance(summary, dict):
+        summary = {}
+    
+    title = article.get("title") or "Tin tức công nghệ"
     embed = discord.Embed(
-        title=article["title"][:256],
+        title=title[:256],
         url=article.get("source_url", ""),
-        description=summary.get("summary_vi", ""),
+        description=summary.get("summary_vi", "Không có tóm tắt."),
         color=CATEGORY_COLORS.get(summary.get("category", "other"), 0x5865F2),
     )
-    embed.add_field(name="Nguồn", value=article.get("source_name", ""), inline=True)
-    tags = " ".join(summary.get("tags", []))
+    embed.add_field(
+        name="Nguồn",
+        value=article.get("source_name", "Nguồn tin"),
+        inline=True,
+    )
+    
+    tags_list = summary.get("tags", [])
+    if isinstance(tags_list, list):
+        tags = " ".join(tags_list)
+    else:
+        tags = str(tags_list) if tags_list else ""
+
     if tags:
         embed.add_field(name="Tags", value=tags, inline=True)
     embed.set_footer(text="TechDigest • Gemini 2.5 Flash")
