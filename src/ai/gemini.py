@@ -47,7 +47,7 @@ Trả về JSON array thuần túy (không markdown, không backtick):
         return json.loads(_clean_json(response.text))
     except Exception as ex:
         logger.error(f"[Gemini] summarize_articles lỗi: {ex}")
-        return []
+        raise ex
 
 
 def summarize_github_repos(repos: list[dict]) -> list[dict]:
@@ -74,4 +74,4 @@ Trả về JSON array thuần túy (không markdown, không backtick):
         return json.loads(_clean_json(response.text))
     except Exception as ex:
         logger.error(f"[Gemini] summarize_github lỗi: {ex}")
-        return []
+        raise ex

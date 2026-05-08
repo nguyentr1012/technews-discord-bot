@@ -21,9 +21,27 @@ async def run_pipeline(channel):
     crawl_data = crawl_all()
     github_repos = scrape_github_trending(limit=5)
 
-    article_summaries = summarize_articles(crawl_data["articles"][:8])
-    release_summaries = summarize_articles(crawl_data.get("ai_releases", []))
-    github_summaries = summarize_github_repos(github_repos)
+    try:
+        article_summaries = summarize_articles(crawl_data["articles"][:8])
+    except Exception as e:
+        await channel.send(f"❌ **Lỗi gọi Gemini (Tin nổi bật):** `{e}`")
+        article_summaries = []
+
+    try:
+        release_summaries = (
+            summarize_articles(crawl_data["ai_releases"])
+            if crawl_data.get("ai_releases")
+            else []
+        )
+    except Exception as e:
+        await channel.send(f"❌ **Lỗi gọi Gemini (AI Releases):** `{e}`")
+        release_summaries = []
+
+    try:
+        github_summaries = summarize_github_repos(github_repos)
+    except Exception as e:
+        await channel.send(f"❌ **Lỗi gọi Gemini (GitHub Trending):** `{e}`")
+        github_summaries = []
 
     await post_digest(
         channel,
