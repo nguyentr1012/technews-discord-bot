@@ -57,31 +57,43 @@ async def post_digest(
 
     # 📰 Tin nổi bật
     await channel.send("**📰 TIN NỔI BẬT**")
-    articles = crawl_data["articles"]
-    for i, s in enumerate(article_summaries[:4]):
-        if i < len(articles):
-            await channel.send(embed=build_embed(articles[i], s))
-            await asyncio.sleep(0.5)
+    articles = crawl_data.get("articles", [])
+    if not articles:
+        await channel.send("⚠️ *Không lấy được tin tức nào từ các nguồn RSS (Có thể IP của server hosting đã bị các trang tin chặn).*")
+    elif not article_summaries:
+        await channel.send("⚠️ *Lỗi tóm tắt tin tức (Có thể do chưa cấu hình hoặc sai API Key Gemini trên Hosting).*")
+    else:
+        for i, s in enumerate(article_summaries[:4]):
+            if i < len(articles):
+                await channel.send(embed=build_embed(articles[i], s))
+                await asyncio.sleep(0.5)
 
     # 🤖 AI Releases — chỉ khi có
     releases = crawl_data.get("ai_releases", [])
-    if release_summaries and releases:
+    if releases:
         await channel.send("**🤖 AI/MODEL RELEASES**")
-        for i, s in enumerate(release_summaries[:3]):
-            if i < len(releases):
-                await channel.send(embed=build_embed(releases[i], s))
-                await asyncio.sleep(0.5)
+        if not release_summaries:
+            await channel.send("⚠️ *Lỗi tóm tắt các bản phát hành AI từ Gemini.*")
+        else:
+            for i, s in enumerate(release_summaries[:3]):
+                if i < len(releases):
+                    await channel.send(embed=build_embed(releases[i], s))
+                    await asyncio.sleep(0.5)
 
     # 🔥 GitHub Trending
-    if github_summaries and github_repos:
-        lines = []
-        for i, s in enumerate(github_summaries):
-            if i < len(github_repos):
-                r = github_repos[i]
-                lines.append(
-                    f"• **{r['name']}** — {s.get('summary_vi', '')} ★ {r['stars_today']} [↗](<{r['url']}>)"
-                )
-        if lines:
-            await channel.send("**🔥 GITHUB TRENDING**\n" + "\n".join(lines))
+    github_repos = github_repos or []
+    if github_repos:
+        if not github_summaries:
+            await channel.send("**🔥 GITHUB TRENDING**\n⚠️ *Lỗi tóm tắt GitHub Trending từ Gemini.*")
+        else:
+            lines = []
+            for i, s in enumerate(github_summaries):
+                if i < len(github_repos):
+                    r = github_repos[i]
+                    lines.append(
+                        f"• **{r['name']}** — {s.get('summary_vi', '')} ★ {r['stars_today']} [↗](<{r['url']}>)"
+                    )
+            if lines:
+                await channel.send("**🔥 GITHUB TRENDING**\n" + "\n".join(lines))
 
     logger.info("Digest posted ✓")
